@@ -35,5 +35,5 @@ Capture the entire text after `/addtask` as `payload` (trim only leading whitesp
 
 ## Output
 Return a short English message:
-- `Task added: TASK_ID - TASK_TITLE`
+- `Task added: TASKID - TASKTITLE`
 
