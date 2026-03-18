@@ -1,0 +1,28 @@
+---
+description: Task execution rules for dreamteam-lite JSON tasks.
+alwaysApply: false
+---
+
+# Task Execution Rules (Lite)
+
+## Task Files / Source of Truth
+
+There are no `.dreamteam/tasks/*.md` files in dreamteam-lite.
+The task source of truth is `tasks.json` in the workspace.
+
+## Developer Responsibilities
+
+- Developer receives a full task object from the orchestrator.
+- Developer MUST NOT modify `goal.json`.
+- Developer MUST NOT modify `tasks.json` status fields.
+- Developer MUST implement the task deliverable and run tests (no watch mode).
+- Developer returns a short one-line summary.
+
+## Reviewer Responsibilities
+
+- Reviewer receives the task object and Developer summary.
+- Reviewer MUST NOT modify `goal.json` or `tasks.json` status fields.
+- Reviewer runs tests (no watch mode) and returns:
+  - `APPROVED`
+  - or `CRITICAL: ...`
+

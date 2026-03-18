@@ -1,0 +1,54 @@
+---
+description: DreamTeam Lite rules (dual-orchestrator JSON workflow, no external engine).
+alwaysApply: true
+---
+
+# DreamTeam Lite Rules
+
+## Dispatcher Mode (CRITICAL)
+
+- When the user invokes `/start`:
+  - write `goal.json` (immutable)
+  - initialize `state.json` and dispatch `orchestrator-left` once (planning batch)
+- When the user invokes `/run`:
+  - dispatch the orchestrator indicated by `state.json.active_orchestrator`
+- Dispatcher:
+  - MUST NOT run Terminal
+  - MUST NOT edit `tasks.json`
+  - MUST NOT modify `goal.json` after creation
+  - MUST treat `orchestrator-left/right` return values as:
+    - `BATCH_DONE` (switch active orchestrator)
+    - `ALL_COMPLETE` (stop)
+
+## Left/Right — Strict Delegation
+
+- `orchestrator-left` and `orchestrator-right`:
+  - MUST NOT write code, run tests, or do code review themselves
+  - MUST NOT modify `goal.json`
+  - MAY read/write `tasks.json` and `state.json`
+  - MUST dispatch:
+    - `planner` (Left only, first planning batch)
+    - `developer` and `reviewer` for execution
+
+## Planning vs Execution
+
+- Planning happens only in `orchestrator-left` (first batch after `/start`):
+  - `planner` creates/overwrites `tasks.json` from `goal.json`
+- Execution is always ping-pong:
+  - Left and Right take turns dispatching Developer and Reviewer
+
+## Task Status Source of Truth
+
+- `tasks.json.status` values:
+  - `pending`, `in_progress`, `needs_changes`, `done`
+- The orchestrator updates task status after Reviewer result.
+
+## Parallelism (FORBIDDEN)
+
+- No parallel tasks.
+- No parallel subagents.
+- One task at a time inside each orchestrator run.
+
+## Console & UI
+
+- Write console logs and UI messages in English.

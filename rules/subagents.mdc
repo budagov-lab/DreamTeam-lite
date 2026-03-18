@@ -1,0 +1,29 @@
+---
+description: Subagent dispatch rules for dreamteam-lite (JSON workflow)
+globs: [".cursor/agents/**/*.md"]
+alwaysApply: false
+---
+
+# Subagent Dispatch
+
+When Left or Right need to dispatch a subagent:
+
+**Load the appropriate agent prompt from `.cursor/agents/`** — each agent has its own file.
+
+## Dispatch via mcp_task
+
+Use `mcp_task` with the correct `subagent_type`:
+
+| Agent | subagent_type |
+|-------|--------------|
+| Developer | `developer` |
+| Reviewer | `reviewer` |
+| Planner | `planner` |
+| Left | `orchestrator-left` (Dispatcher only) |
+| Right | `orchestrator-right` (Dispatcher only) |
+
+## Terminal / Command Execution (Lite)
+
+This lite version does not define a dedicated `shell` / Terminal subagent.
+However, `developer` and `reviewer` MAY execute test commands using the available Cursor command execution capability (as an instrument).
+

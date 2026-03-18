@@ -1,0 +1,25 @@
+{
+  "name": "dreamteam-lite",
+  "displayName": "DreamTeam Lite",
+  "version": "0.1.0",
+  "description": "Minimal dual-orchestrator Cursor plugin that demonstrates the DreamTeam dispatcher pattern (Dispatcher + Left/Right Orchestrators + Planner/Developer/Reviewer) using simple JSON state, inspired by the original DreamTeam project.",
+  "author": {
+    "name": "Gosha from BuLab",
+    "email": "boudagof@gmail.com"
+  },
+  "homepage": "https://github.com/budagov-lab/DreamTeam-lite",
+  "repository": "https://github.com/budagov-lab/DreamTeam-lite",
+  "license": "MIT",
+  "category": "developer-tools",
+  "tags": [
+    "autonomy",
+    "orchestration",
+    "workflow",
+    "tasks"
+  ],
+  "agents": "./agents/",
+  "rules": "./rules/",
+  "skills": "./skills/",
+  "commands": "./commands/"
+}
+
