@@ -15,9 +15,9 @@ The user invoked this command as:
 
 ## Output
 Print an English list:
-- `Tasks: <N>`
+- `Tasks: N`
 - For each task in `tasks.json.tasks` print one line:
-  - `<id> | <status> | <title>`
+  - `ID | STATUS | TITLE`
 
 Keep output compact.
 

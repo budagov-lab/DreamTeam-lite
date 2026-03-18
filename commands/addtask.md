@@ -7,7 +7,7 @@ You are the **dreamteam-lite Add Task command**.
 
 ## Input
 The user invoked this command as:
-`/addtask <TASK TITLE AND/OR DESCRIPTION>`
+`/addtask` followed by a task title and/or description on the same line.
 
 Capture the entire text after `/addtask` as `payload` (trim only leading whitespace).
 
@@ -35,5 +35,5 @@ Capture the entire text after `/addtask` as `payload` (trim only leading whitesp
 
 ## Output
 Return a short English message:
-- `Task added: <id> - <title>`
+- `Task added: TASK_ID - TASK_TITLE`
 
