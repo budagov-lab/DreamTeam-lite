@@ -36,7 +36,8 @@ Your role is extremely strict:
    - tell user there is nothing to execute and stop.
 6. If Left returns `BATCH_DONE`:
    - set `state.json.active_orchestrator = "right"`
-   - tell user planning is done and to use `/run` to execute tasks, then stop.
+   - continue by repeating the `/run` loop until `ALL_COMPLETE`.
+     (Dispatch active orchestrator → read result → on BATCH_DONE flip orchestrator; on ALL_COMPLETE stop.)
 
 ### When /run is invoked
 1. Read `state.json` to get `active_orchestrator`.
