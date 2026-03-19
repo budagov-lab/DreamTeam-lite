@@ -21,13 +21,16 @@ Canonical reference (pattern and original project):
 - Stores all state in plain JSON files inside `.dreamteam-lite/`:
   - `.dreamteam-lite/goal.json` — immutable project goal.
   - `.dreamteam-lite/tasks.json` — list of tasks created by the Planner and updated by the orchestrators.
-  - `.dreamteam-lite/state.json` — active orchestrator, token counters, and run status.
+  - `.dreamteam-lite/state.json` — active orchestrator, batch routing markers, and run status.
 - Demonstrates the **ping-pong execution loop**:
   - Main chat (via skills) acts as dispatcher and calls **Left** once to plan.
-  - After planning, main chat alternates **Right ↔ Left** while they execute tasks.
+  - After planning, dispatching is state-driven: each orchestrator writes batch markers, then dispatcher calls the opposite side.
   - Each switch conceptually resets the orchestrator’s context while keeping tasks in JSON.
 
-There is **no external Python engine** here: all orchestration lives inside Cursor agents and JSON.
+There is **no external engine** here: all orchestration lives inside Cursor agents and JSON.
+
+Although this is a compact demo project, it has enough practical autonomy to solve small real tasks end-to-end, not just showcase an orchestration pattern.  
+It was tested with the models typically available in Cursor after hitting normal limits (yes, the free-tier fallback ones) — and it still gets the job done.
 
 ### Relationship to the main DreamTeam project
 
@@ -54,6 +57,12 @@ pattern inside Cursor, DreamTeam Lite is designed for that.
 - Dispatcher core contract remains `/start` and `/run` internally:
   - Goal capture for start is still **all text immediately after `/start`** (verbatim).
   - Skills apply the same contract without spawning a separate `dispatcher` subagent.
+- Current execution details:
+  - Exactly one task is processed per orchestrator call.
+  - If Reviewer returns `CRITICAL`, the same task is retried up to 2 additional times (3 total attempts).
+  - If still not approved, task stays `needs_changes` with `unfinished = true` and `unfinished_reason`.
+  - On resume, tasks with `status = "in_progress"` are prioritized first.
+  - If `.dreamteam-lite/state.json` or `.dreamteam-lite/goal.json` is malformed (e.g., concatenated JSON objects), agents normalize it to one valid object and continue.
 
 All runtime instructions and UI/console messages must be in **English**. The documentation here is
 also in English so that the plugin can be shared easily.
