@@ -21,7 +21,7 @@ There is **no external engine** here: all orchestration lives inside Cursor agen
 
 Although this is a compact demo project, it has enough practical autonomy to solve small real tasks end-to-end, not just showcase an orchestration pattern.  
 It was tested with the models typically available in Cursor after hitting normal limits (yes, the free-tier fallback ones) — so it does not depend on top-tier models to be useful.
-[![Watch the demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=M8LF81M9rS8&t=2222s)
+[![Watch the demo](https://img.youtube.com/vi/M8LF81M9rS8&t=2222s/0.jpg)](https://www.youtube.com/watch?v=M8LF81M9rS8&t=2222s)
 
 ### Relationship to the main DreamTeam project
 
