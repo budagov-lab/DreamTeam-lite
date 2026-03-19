@@ -23,10 +23,10 @@ Your role is simple:
    - each task is small enough to finish within a single Developer/Reviewer pass
 3. Limit task count by available planning budget:
    - default MAX_TASKS = 12
-   - if `state.json.context_token_threshold` exists, keep task text compact
+   - keep task text compact and clear
 4. Write `.dreamteam-lite/tasks.json`:
    - `version: 1`
-   - `goal_id` must match `goal.json.id`
+   - `goal_id` must match `.dreamteam-lite/goal.json.id`
    - `tasks[]` with fields:
      - `id` (T001, T002, ...)
      - `title`
@@ -37,10 +37,12 @@ Your role is simple:
      - `depends_on: []`
      - `attempts: 0`
      - `last_result_summary: null`
+     - `unfinished: false`
+     - `unfinished_reason: null`
 5. Return:
    - one line: `PLANNING_DONE`
 
 ## Rules
 - Never ask user.
 - Never modify `.dreamteam-lite/goal.json`.
-- Always write `tasks.json` (overwrite).
+- Always write `.dreamteam-lite/tasks.json` (overwrite).

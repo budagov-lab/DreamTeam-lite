@@ -18,13 +18,13 @@ Canonical reference (pattern and original project):
 
 - Installs a **lightweight Dispatcher** plus **Left and Right Orchestrators** into Cursor.
 - Uses a simple **Planner → Developer → Reviewer** loop with a manually inspectable JSON task list.
-- Stores all state in plain JSON files inside the workspace:
-  - `goal.json` — immutable project goal (written once on `/start`, then read-only for subagents).
-  - `tasks.json` — list of tasks created by the Planner and updated by the orchestrators.
-  - `state.json` — which orchestrator is active, simple approximate context counters, run status.
+- Stores all state in plain JSON files inside `.dreamteam-lite/`:
+  - `.dreamteam-lite/goal.json` — immutable project goal.
+  - `.dreamteam-lite/tasks.json` — list of tasks created by the Planner and updated by the orchestrators.
+  - `.dreamteam-lite/state.json` — active orchestrator, token counters, and run status.
 - Demonstrates the **ping-pong execution loop**:
-  - Dispatcher captures the goal and calls **Left** once to plan.
-  - After planning, Dispatcher alternates **Right ↔ Left** while they execute tasks.
+  - Main chat (via skills) acts as dispatcher and calls **Left** once to plan.
+  - After planning, main chat alternates **Right ↔ Left** while they execute tasks.
   - Each switch conceptually resets the orchestrator’s context while keeping tasks in JSON.
 
 There is **no external Python engine** here: all orchestration lives inside Cursor agents and JSON.
@@ -53,11 +53,7 @@ pattern inside Cursor, DreamTeam Lite is designed for that.
   - Task state is never shared between different repositories/projects.
 - Dispatcher core contract remains `/start` and `/run` internally:
   - Goal capture for start is still **all text immediately after `/start`** (verbatim).
-  - The skill `/start-dreamteam` maps user input into the same internal `/start` flow.
-- Legacy plugin command files also exist:
-  - `.cursor-plugin/commands/start.md`
-  - `.cursor-plugin/commands/run.md`
-  - Depending on Cursor command indexing, these may not appear directly in slash suggestions.
+  - Skills apply the same contract without spawning a separate `dispatcher` subagent.
 
 All runtime instructions and UI/console messages must be in **English**. The documentation here is
 also in English so that the plugin can be shared easily.

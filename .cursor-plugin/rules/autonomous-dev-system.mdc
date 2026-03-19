@@ -14,8 +14,14 @@ alwaysApply: true
   - dispatch the orchestrator indicated by `.dreamteam-lite/state.json.active_orchestrator`
 - Dispatcher:
   - MUST NOT run Terminal
+  - MUST NOT call `planner`, `developer`, or `reviewer` directly
+  - MUST NOT implement code, run tests, or perform review
   - MUST NOT edit `.dreamteam-lite/tasks.json`
   - MUST NOT modify `.dreamteam-lite/goal.json` after creation
+  - MUST call `Task` with `subagent_type: orchestrator-left` immediately after `/start` state initialization
+  - MUST auto-switch orchestrators based on state markers written by orchestrators:
+    - `.dreamteam-lite/state.json.last_finished_orchestrator`
+    - `.dreamteam-lite/state.json.last_batch_result`
   - MUST treat `orchestrator-left/right` return values as:
     - `BATCH_DONE` (switch active orchestrator)
     - `ALL_COMPLETE` (stop)
@@ -27,6 +33,9 @@ alwaysApply: true
   - `goal.json`, `tasks.json`, `state.json` MUST be stored only under `.dreamteam-lite/`.
 - Never read or write runtime state in global directories (for example user home, global plugin folders, temp folders).
 - Never share runtime state between repositories/projects.
+- JSON recovery policy:
+  - if `.dreamteam-lite/state.json` or `.dreamteam-lite/goal.json` is malformed (including multiple concatenated JSON objects), normalize to exactly one valid JSON object and continue.
+  - reporting level in chat is up to the active agent; no forced suppression of diagnostics.
 
 ## Left/Right — Strict Delegation
 
@@ -51,12 +60,23 @@ alwaysApply: true
 - `.dreamteam-lite/tasks.json.status` values:
   - `pending`, `in_progress`, `needs_changes`, `done`
 - The orchestrator updates task status after Reviewer result.
+- Task unfinished tracking fields:
+  - `unfinished` (boolean)
+  - `unfinished_reason` (string or null)
+- Batch routing fields in `.dreamteam-lite/state.json`:
+  - `last_finished_orchestrator` (`left` or `right`)
+  - `last_batch_result` (`BATCH_DONE` or `ALL_COMPLETE`)
+- Retry policy for CRITICAL:
+  - for the same task, run up to 2 additional retries (max 3 total attempts).
+  - if still CRITICAL after 3 attempts, keep `status = "needs_changes"`, set `unfinished = true`, set `unfinished_reason`, and write an explicit `UNFINISHED` marker in `last_result_summary`.
+- Resume policy after interruption:
+  - always prioritize tasks with `status = "in_progress"` before `pending` or `needs_changes`.
 
 ## Parallelism (FORBIDDEN)
 
 - No parallel tasks.
 - No parallel subagents.
-- One task at a time inside each orchestrator run.
+- Exactly one task per orchestrator call.
 
 ## Console & UI
 

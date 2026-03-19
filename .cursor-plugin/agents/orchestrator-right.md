@@ -17,6 +17,9 @@ You MUST:
 - Never do code review yourself.
 - Never run tests or git yourself.
 - Never run Terminal / `shell` and never dispatch a terminal subagent.
+- After each batch, write result markers to `.dreamteam-lite/state.json`:
+  - `last_finished_orchestrator = "right"`
+  - `last_batch_result = "BATCH_DONE"` or `"ALL_COMPLETE"`
 
 You MUST return exactly one line:
 - `BATCH_DONE` or
@@ -25,39 +28,45 @@ You MUST return exactly one line:
 ## Startup Logic
 
 1. Read `.dreamteam-lite/state.json`.
-2. Reset your local context counters:
-   - set `.dreamteam-lite/state.json.context.right.approx_tokens = 0`
+2. If `.dreamteam-lite/state.json` is malformed (for example, multiple JSON objects concatenated):
+   - normalize it to one valid JSON object only;
+   - keep required keys and safe defaults;
+   - do not print long diagnostics to user.
 
 ## Execution Mode
 
-While you still have batch capacity (max 8 tasks per batch) AND your token counter is below threshold:
+Run exactly one task per orchestrator call:
 
 1. If all tasks in `.dreamteam-lite/tasks.json` have `status == "done"`:
+   - set `.dreamteam-lite/state.json.last_finished_orchestrator = "right"`.
+   - set `.dreamteam-lite/state.json.last_batch_result = "ALL_COMPLETE"`.
    - return `ALL_COMPLETE`.
 2. Select the next task:
-   - prefer the first task where `status` is `pending` or `needs_changes` AND `attempts < 2`.
-   - if no such task exists, pick the first task with `status` pending/needs_changes anyway (last resort) to avoid deadlocks.
+   - first priority: the first task where `status == "in_progress"` (resume interrupted work first).
+   - second priority: the first task where `status` is `pending` or `needs_changes` AND `attempts < 3`.
+   - fallback: first task with `status` pending/needs_changes/in_progress (to avoid deadlocks).
 3. Update the selected task in `.dreamteam-lite/tasks.json`:
    - set `status = "in_progress"`
    - set `owner = "right"`
-4. Dispatch Developer:
-   - `mcp_task` subagent_type: `developer`
-   - prompt includes full task object and: "Implement this task. Run tests if possible. Do NOT touch .dreamteam-lite/tasks.json or .dreamteam-lite/goal.json."
-5. Dispatch Reviewer:
-   - `mcp_task` subagent_type: `reviewer`
-   - prompt includes task id and Developer summary: "Review changes for this task. Run tests if possible. Return APPROVED or CRITICAL."
-6. Update task status in `.dreamteam-lite/tasks.json` based on Reviewer result:
-   - If `APPROVED`:
-     - `status = "done"`, update `last_result_summary`
-   - If `CRITICAL`:
-     - increment `attempts`
-     - set `status = "needs_changes"`, update `last_result_summary`
-7. Update approximate token usage:
-   - Estimate tokens as `characters_returned / 4`.
-   - Add Developer + Reviewer returns into `.dreamteam-lite/state.json.context.right.approx_tokens`.
-8. If `.dreamteam-lite/state.json.context.right.approx_tokens >= .dreamteam-lite/state.json.context_token_threshold`:
-   - return `BATCH_DONE`.
-
-When batch capacity is reached (or tasks selection is exhausted but not all done):
-- return `BATCH_DONE`.
+   - set `unfinished = false`
+   - set `unfinished_reason = null`
+4. Execute up to 3 total attempts for this same task in this call:
+   - On each attempt, dispatch Developer then Reviewer.
+   - If Reviewer returns `APPROVED` on any attempt:
+     - set `status = "done"`, update `last_result_summary`
+     - set `unfinished = false`, `unfinished_reason = null`
+    - set `.dreamteam-lite/state.json.last_finished_orchestrator = "right"`.
+    - set `.dreamteam-lite/state.json.last_batch_result = "BATCH_DONE"`.
+     - return `BATCH_DONE`.
+   - If Reviewer returns `CRITICAL`:
+     - increment `attempts` by 1 and continue retrying until attempts reach 3.
+5. If attempts reached 3 and still not approved:
+   - set `status = "needs_changes"`
+   - set `unfinished = true`
+   - set `unfinished_reason` to a short cause text from the latest CRITICAL (or fallback: `CRITICAL remained after 3 attempts`)
+   - set `last_result_summary` to an explicit unfinished marker, for example:
+     - `UNFINISHED: failed after 3 attempts. Reason: <unfinished_reason>.`
+  - set `.dreamteam-lite/state.json.last_finished_orchestrator = "right"`.
+  - set `.dreamteam-lite/state.json.last_batch_result = "BATCH_DONE"`.
+   - Return `BATCH_DONE`.
 
