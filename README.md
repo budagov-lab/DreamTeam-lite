@@ -1,31 +1,21 @@
 ## DreamTeam Lite (Cursor plugin)
 
-This repository contains **DreamTeam Lite**, a compact Cursor plugin that implements a simplified,
-self-contained version of the dual-orchestrator pattern from the original DreamTeam project
-(`https://github.com/budagov-lab/DreamTeam`).
-
-Source repository (this project):
-`https://github.com/budagov-lab/DreamTeam-lite`
-
-Canonical reference (pattern and original project):
-`https://github.com/budagov-lab/DreamTeam`
-
-> This is **not** a full port of DreamTeam.  
-> It is a focused implementation of the pattern (Dispatcher → Left/Right Orchestrators → Planner/Developer/Reviewer)
-> using only Cursor agents, rules, skills, and a few JSON files.
+DreamTeam Lite is a Cursor plugin for developers and vibe-coders who want to turn an idea into finished tasks without losing context.
+It keeps your goal and task state in sync, automatically routes work between specialized agents,
+and helps you continue from where you left off after interruptions.
 
 ### What this plugin does
 
-- Installs a **lightweight Dispatcher** plus **Left and Right Orchestrators** into Cursor.
-- Uses a simple **Planner → Developer → Reviewer** loop with a manually inspectable JSON task list.
-- Stores all state in plain JSON files inside `.dreamteam-lite/`:
+- Converts one high-level goal into a trackable delivery flow (`Planner -> Developer -> Reviewer`).
+- Uses state-driven orchestration so work continues predictably instead of stalling in chat context.
+- Automatically alternates orchestration sides (`Left <-> Right`) while preserving progress.
+- Recovers from interrupted sessions by resuming `in_progress` work first.
+- Handles failed task attempts with bounded retries and explicit unfinished reasons.
+- Stores all runtime state in plain JSON files inside `.dreamteam-lite/`:
   - `.dreamteam-lite/goal.json` — immutable project goal.
   - `.dreamteam-lite/tasks.json` — list of tasks created by the Planner and updated by the orchestrators.
   - `.dreamteam-lite/state.json` — active orchestrator, batch routing markers, and run status.
-- Demonstrates the **ping-pong execution loop**:
-  - Main chat (via skills) acts as dispatcher and calls **Left** once to plan.
-  - After planning, dispatching is state-driven: each orchestrator writes batch markers, then dispatcher calls the opposite side.
-  - Each switch resets orchestration context while preserving progress in JSON state.
+- Keeps state human-readable and auditable, so you can inspect and control the workflow at any time.
 
 There is **no external engine** here: all orchestration lives inside Cursor agents and JSON.
 
