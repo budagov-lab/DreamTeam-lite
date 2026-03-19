@@ -44,14 +44,20 @@ pattern inside Cursor, DreamTeam Lite is designed for that.
 
 ### Usage (conceptual)
 
-- In Cursor: `/start <FULL GOAL TEXT>`
-  - The Dispatcher stores **all text immediately after `/start`** into `goal.json.description` (verbatim).
-  - Then it calls Left for planning.
-- Optional manual overrides:
-  - `/addtask <TASK TITLE AND/OR DESCRIPTION>` to append a new pending task into `tasks.json`.
-  - `/tasklist` to print current tasks.
-- Then: `/run` (and repeat as needed).
-  - Dispatcher alternates Left and Right until all tasks in `tasks.json` are done.
+- Primary entrypoints after plugin install:
+  - `/start-dreamteam <FULL GOAL TEXT>` to initialize goal/state and trigger planning.
+  - `/run-dreamteam` to continue execution batches until completion.
+- Project-local behavior:
+  - Runtime files are stored under `.dreamteam-lite/` in the current workspace only.
+  - At startup, the Left Orchestrator creates `.dreamteam-lite/` if it does not exist.
+  - Task state is never shared between different repositories/projects.
+- Dispatcher core contract remains `/start` and `/run` internally:
+  - Goal capture for start is still **all text immediately after `/start`** (verbatim).
+  - The skill `/start-dreamteam` maps user input into the same internal `/start` flow.
+- Legacy plugin command files also exist:
+  - `.cursor-plugin/commands/start.md`
+  - `.cursor-plugin/commands/run.md`
+  - Depending on Cursor command indexing, these may not appear directly in slash suggestions.
 
 All runtime instructions and UI/console messages must be in **English**. The documentation here is
 also in English so that the plugin can be shared easily.

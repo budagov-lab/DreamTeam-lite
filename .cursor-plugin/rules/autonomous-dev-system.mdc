@@ -8,24 +8,33 @@ alwaysApply: true
 ## Dispatcher Mode (CRITICAL)
 
 - When the user invokes `/start`:
-  - write `goal.json` (immutable)
-  - initialize `state.json` and dispatch `orchestrator-left` once (planning batch)
+  - write `.dreamteam-lite/goal.json` (immutable)
+  - initialize `.dreamteam-lite/state.json` and dispatch `orchestrator-left` once (planning batch)
 - When the user invokes `/run`:
-  - dispatch the orchestrator indicated by `state.json.active_orchestrator`
+  - dispatch the orchestrator indicated by `.dreamteam-lite/state.json.active_orchestrator`
 - Dispatcher:
   - MUST NOT run Terminal
-  - MUST NOT edit `tasks.json`
-  - MUST NOT modify `goal.json` after creation
+  - MUST NOT edit `.dreamteam-lite/tasks.json`
+  - MUST NOT modify `.dreamteam-lite/goal.json` after creation
   - MUST treat `orchestrator-left/right` return values as:
     - `BATCH_DONE` (switch active orchestrator)
     - `ALL_COMPLETE` (stop)
 
+## Project-Local State (CRITICAL)
+
+- Runtime state is strictly workspace-scoped:
+  - create and use `.dreamteam-lite/` in the current workspace root.
+  - `goal.json`, `tasks.json`, `state.json` MUST be stored only under `.dreamteam-lite/`.
+- Never read or write runtime state in global directories (for example user home, global plugin folders, temp folders).
+- Never share runtime state between repositories/projects.
+
 ## Left/Right — Strict Delegation
 
 - `orchestrator-left` and `orchestrator-right`:
+  - `orchestrator-left` MUST create `.dreamteam-lite/` in workspace root at startup if missing
   - MUST NOT write code, run tests, or do code review themselves
-  - MUST NOT modify `goal.json`
-  - MAY read/write `tasks.json` and `state.json`
+  - MUST NOT modify `.dreamteam-lite/goal.json`
+  - MAY read/write `.dreamteam-lite/tasks.json` and `.dreamteam-lite/state.json`
   - MUST dispatch:
     - `planner` (Left only, first planning batch)
     - `developer` and `reviewer` for execution
@@ -33,13 +42,13 @@ alwaysApply: true
 ## Planning vs Execution
 
 - Planning happens only in `orchestrator-left` (first batch after `/start`):
-  - `planner` creates/overwrites `tasks.json` from `goal.json`
+  - `planner` creates/overwrites `.dreamteam-lite/tasks.json` from `.dreamteam-lite/goal.json`
 - Execution is always ping-pong:
   - Left and Right take turns dispatching Developer and Reviewer
 
 ## Task Status Source of Truth
 
-- `tasks.json.status` values:
+- `.dreamteam-lite/tasks.json.status` values:
   - `pending`, `in_progress`, `needs_changes`, `done`
 - The orchestrator updates task status after Reviewer result.
 
