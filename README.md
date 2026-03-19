@@ -1,8 +1,8 @@
 ## DreamTeam Lite (Cursor plugin)
 
-This repository contains **DreamTeam Lite**, a minimal Cursor plugin that demonstrates the
-dual-orchestrator dispatcher pattern from the original
-DreamTeam project (`https://github.com/budagov-lab/DreamTeam`) in a simplified, self-contained way.
+This repository contains **DreamTeam Lite**, a compact Cursor plugin that implements a simplified,
+self-contained version of the dual-orchestrator pattern from the original DreamTeam project
+(`https://github.com/budagov-lab/DreamTeam`).
 
 Source repository (this project):
 `https://github.com/budagov-lab/DreamTeam-lite`
@@ -11,8 +11,8 @@ Canonical reference (pattern and original project):
 `https://github.com/budagov-lab/DreamTeam`
 
 > This is **not** a full port of DreamTeam.  
-> It is a **small example** that shows how the pattern works (Dispatcher → Left/Right Orchestrators → Planner/Developer/Reviewer)
-> using only Cursor agents, rules, skills, and a couple of JSON files.
+> It is a focused implementation of the pattern (Dispatcher → Left/Right Orchestrators → Planner/Developer/Reviewer)
+> using only Cursor agents, rules, skills, and a few JSON files.
 
 ### What this plugin does
 
@@ -25,12 +25,12 @@ Canonical reference (pattern and original project):
 - Demonstrates the **ping-pong execution loop**:
   - Main chat (via skills) acts as dispatcher and calls **Left** once to plan.
   - After planning, dispatching is state-driven: each orchestrator writes batch markers, then dispatcher calls the opposite side.
-  - Each switch conceptually resets the orchestrator’s context while keeping tasks in JSON.
+  - Each switch resets orchestration context while preserving progress in JSON state.
 
 There is **no external engine** here: all orchestration lives inside Cursor agents and JSON.
 
 Although this is a compact demo project, it has enough practical autonomy to solve small real tasks end-to-end, not just showcase an orchestration pattern.  
-It was tested with the models typically available in Cursor after hitting normal limits (yes, the free-tier fallback ones) — and it still gets the job done.
+It was tested with the models typically available in Cursor after hitting normal limits (yes, the free-tier fallback ones) — so it does not depend on top-tier models to be useful.
 
 ### Relationship to the main DreamTeam project
 
@@ -39,11 +39,10 @@ It was tested with the models typically available in Cursor after hitting normal
 - DreamTeam Lite:
   - **reuses the high-level pattern** (Dispatcher + Left/Right, planning vs execution),
   - but **removes** the SQLite task DAG, advanced maintenance agents, analytics dashboard, and CLI.
-  - is intended only as a **didactic example** and a starting point for your own experiments.
+  - is designed as a practical learning project and a starting point for experiments.
 
-If you need the full autonomous development cruiser with hundreds of tasks, dashboards, and the
-Python engine, use the main DreamTeam project. If you only want to understand and play with the
-pattern inside Cursor, DreamTeam Lite is designed for that.
+If you need the full autonomous development stack with large task graphs, dashboards, and advanced runtime tooling, use the main DreamTeam project.  
+If you want a lightweight, Cursor-native version of the orchestration pattern, DreamTeam Lite is built for that.
 
 ### Usage (conceptual)
 
