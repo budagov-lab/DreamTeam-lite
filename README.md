@@ -1,8 +1,29 @@
 ## DreamTeam Lite (Cursor plugin)
 
-DreamTeam Lite is a Cursor plugin for developers and vibe-coders who want to turn an idea into finished tasks without losing context.
-It keeps your goal and task state in sync, automatically routes work between specialized agents,
+DreamTeam Lite is a Cursor plugin for developers and vibe-coders that helps execution move autonomously.
+It keeps your goal and task state in sync, routes work between specialized agents,
 and helps you continue from where you left off after interruptions.
+
+### Workflow (Dispatcher is the central switch)
+The main chat acts as the Dispatcher: it initializes `state.json`, then uses `last_batch_result` and `last_finished_orchestrator` written by orchestrators to decide which side (Left/Right) runs next.
+Each orchestrator completes a unit of work and writes fresh batch markers back to `state.json`, so the loop keeps going without manual babysitting.
+
+### Add Plugin Manually (Local)
+If you want to add DreamTeam Lite to Cursor without publishing/installing from the marketplace, copy the plugin bundle into Cursor’s local plugins folder.
+
+1. In this repository, locate `dreamteam/.cursor-plugin/`.
+2. Create the folder:
+   - `%USERPROFILE%\.cursor\plugins\local\dreamteam-lite\`
+3. Copy the whole `dreamteam/.cursor-plugin/` folder into:
+   - `%USERPROFILE%\.cursor\plugins\local\dreamteam-lite\`
+4. Verify that `plugin.json` exists at:
+   - `%USERPROFILE%\.cursor\plugins\local\dreamteam-lite\.cursor-plugin\plugin.json`
+5. Restart Cursor (or run Developer: Reload Window).
+6. In any workspace, open Cursor chat and test:
+   - `/start-dreamteam <FULL GOAL TEXT>`
+   - then `/run-dreamteam` (if execution was not completed in the first step).
+
+After start/run, runtime state files are created in the current workspace under `.dreamteam-lite/`.
 
 ### What this plugin does
 
@@ -19,9 +40,7 @@ and helps you continue from where you left off after interruptions.
 
 There is **no external engine** here: all orchestration lives inside Cursor agents and JSON.
 
-Although this is a compact demo project, it has enough practical autonomy to solve small real tasks end-to-end, not just showcase an orchestration pattern.  
-It was tested with the models typically available in Cursor after hitting normal limits (yes, the free-tier fallback ones) — so it does not depend on top-tier models to be useful.
-[![Watch how this Cursor plugin builds a Snake game autonomously](https://img.youtube.com/vi/M8LF81M9rS8&t/0.jpg)](https://www.youtube.com/watch?v=M8LF81M9rS8&t=2222s)
+Even though this is a compact demo, it is built to be practically useful end-to-end: small tasks can be completed without babysitting, and the workflow keeps its shape under typical Cursor model limits.
 
 ### Relationship to the main DreamTeam project
 
@@ -57,20 +76,15 @@ If you want a lightweight, Cursor-native version of the orchestration pattern, D
 All runtime instructions and UI/console messages must be in **English**. The documentation here is
 also in English so that the plugin can be shared easily.
 
-### Add Plugin Manually (Local)
-If you want to add DreamTeam Lite to Cursor without publishing/installing from the marketplace, copy the plugin bundle into Cursor’s local plugins folder.
+### Autonomy Proof (Snake from zero)
 
-1. In this repository, locate `dreamteam/.cursor-plugin/`.
-2. Create the folder:
-   - `%USERPROFILE%\.cursor\plugins\local\dreamteam-lite\`
-3. Copy the whole `dreamteam/.cursor-plugin/` folder into:
-   - `%USERPROFILE%\.cursor\plugins\local\dreamteam-lite\`
-4. Verify that `plugin.json` exists at:
-   - `%USERPROFILE%\.cursor\plugins\local\dreamteam-lite\.cursor-plugin\plugin.json`
-5. Restart Cursor (or run Developer: Reload Window).
-6. In any workspace, open Cursor chat and test:
-   - `/start-dreamteam <FULL GOAL TEXT>`
-   - then `/run-dreamteam` (if execution was not completed in the first step).
+- Goal: `create a simple Snake game for playing in browser`
+- Prompt: one user prompt to start the whole workflow
+- Execution: `AUTO` under Cursor free-tier limits
+- Result: a complete playable Snake game shipped from scratch (no manual babysitting)
+- Runtime: ~37 minutes
+- Evidence: generated `.dreamteam-lite/state.json` ended with `run_status = "all_complete"` and `.dreamteam-lite/tasks.json` ended with `status = "done"` for all tasks
 
-After start/run, runtime state files are created in the current workspace under `.dreamteam-lite/`.
+Video (full run):
+[![Watch how this Cursor plugin builds a Snake game autonomously](https://img.youtube.com/vi/M8LF81M9rS8&t/0.jpg)](https://www.youtube.com/watch?v=M8LF81M9rS8&t=2222s)
 
