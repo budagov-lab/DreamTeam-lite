@@ -57,3 +57,20 @@ If you want a lightweight, Cursor-native version of the orchestration pattern, D
 All runtime instructions and UI/console messages must be in **English**. The documentation here is
 also in English so that the plugin can be shared easily.
 
+### Add Plugin Manually (Local)
+If you want to add DreamTeam Lite to Cursor without publishing/installing from the marketplace, copy the plugin bundle into Cursor’s local plugins folder.
+
+1. In this repository, locate `dreamteam/.cursor-plugin/`.
+2. Create the folder:
+   - `%USERPROFILE%\.cursor\plugins\local\dreamteam-lite\`
+3. Copy the whole `dreamteam/.cursor-plugin/` folder into:
+   - `%USERPROFILE%\.cursor\plugins\local\dreamteam-lite\`
+4. Verify that `plugin.json` exists at:
+   - `%USERPROFILE%\.cursor\plugins\local\dreamteam-lite\.cursor-plugin\plugin.json`
+5. Restart Cursor (or run Developer: Reload Window).
+6. In any workspace, open Cursor chat and test:
+   - `/start-dreamteam <FULL GOAL TEXT>`
+   - then `/run-dreamteam` (if execution was not completed in the first step).
+
+After start/run, runtime state files are created in the current workspace under `.dreamteam-lite/`.
+
